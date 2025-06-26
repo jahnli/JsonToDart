@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:json_to_dart/main_controller.dart';
+import 'package:json_to_dart/models/config.dart';
 import 'package:json_to_dart/style/color.dart';
 
 class JsonTextField extends StatelessWidget {
@@ -26,6 +27,22 @@ class JsonTextField extends StatelessWidget {
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),
+        onChanged: (String value) {
+          final String v = '''
+/*
+ * PlantU Mobile
+ * lijiaheng
+*/
+
+/*
+* Example:
+$value 
+*/
+''';
+          controller.fileHeaderHelpController.text = v;
+          ConfigSetting().fileHeaderInfo = v;
+          ConfigSetting().save();
+        },
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:json_to_dart/l10n/app_localizations.dart';
 import 'package:json_to_dart/main_controller.dart';
 import 'package:json_to_dart/models/config.dart';
 import 'package:json_to_dart/pages/result.dart';
@@ -69,7 +69,7 @@ class SettingWidget extends StatelessWidget {
               iconEnabledColor: ColorPlate.blue,
               elevation: 1,
               style: StandardTextStyle.normal.apply(color: ColorPlate.blue),
-              items: AppLocalizations.supportedLocales
+              items: AppLocalizations. supportedLocales
                   .map((Locale locale) => DropdownMenuItem<Locale>(
                         value: locale,
                         child: StText.normal(locale.toString()),

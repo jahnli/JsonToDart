@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -23,39 +24,37 @@ class ConfigSetting extends Setting<ConfigSetting> {
   int column2Width = 3;
 
   @HiveField(3)
-  RxBool enableArrayProtection = false.obs;
+  RxBool enableArrayProtection = true.obs;
 
   @HiveField(4)
-  RxBool enableDataProtection = false.obs;
+  RxBool enableDataProtection = true.obs;
 
   @HiveField(5)
   String fileHeaderInfo = '';
 
   @HiveField(6)
-  RxInt traverseArrayCount = 1.obs;
+  RxInt traverseArrayCount = 99.obs;
   @HiveField(7)
-  Rx<PropertyNamingConventionsType> propertyNamingConventionsType =
-      PropertyNamingConventionsType.camelCase.obs;
+  Rx<PropertyNamingConventionsType> propertyNamingConventionsType = PropertyNamingConventionsType.camelCase.obs;
   @HiveField(8)
   Rx<PropertyAccessorType> propertyAccessorType = PropertyAccessorType.none.obs;
   @HiveField(9)
-  Rx<PropertyNameSortingType> propertyNameSortingType =
-      PropertyNameSortingType.none.obs;
+  Rx<PropertyNameSortingType> propertyNameSortingType = PropertyNameSortingType.none.obs;
 
   @HiveField(16)
-  RxBool nullsafety = false.obs;
+  RxBool nullsafety = true.obs;
 
   @HiveField(17)
   RxBool nullable = true.obs;
 
   @HiveField(12)
-  Rx<Locale> locale = const Locale.fromSubtags(languageCode: 'en').obs;
+  Rx<Locale> locale = const Locale.fromSubtags(languageCode: 'zh').obs;
 
   @HiveField(18)
   RxBool smartNullable = false.obs;
 
   @HiveField(14)
-  RxBool addCopyMethod = false.obs;
+  RxBool addCopyMethod = true.obs;
 
   @HiveField(15)
   RxBool automaticCheck = true.obs;
@@ -67,7 +66,7 @@ class ConfigSetting extends Setting<ConfigSetting> {
   Rx<EqualityMethodType> equalityMethodType = EqualityMethodType.official.obs;
 
   @HiveField(21)
-  RxBool deepCopy = false.obs;
+  RxBool deepCopy = true.obs;
   @override
   Future<void> init({
     TypeAdapter<ConfigSetting>? adapter,
@@ -100,15 +99,13 @@ class RxTypeAdapter<T> extends TypeAdapter<Rx<T>> {
     } else if (PropertyAccessorType.none is T) {
       return PropertyAccessorType.values[reader.readInt()].obs as Rx<T>;
     } else if (PropertyNamingConventionsType.none is T) {
-      return PropertyNamingConventionsType.values[reader.readInt()].obs
-          as Rx<T>;
+      return PropertyNamingConventionsType.values[reader.readInt()].obs as Rx<T>;
     } else if (PropertyNameSortingType.none is T) {
       return PropertyNameSortingType.values[reader.readInt()].obs as Rx<T>;
     } else if (EqualityMethodType.none is T) {
       return EqualityMethodType.values[reader.readInt()].obs as Rx<T>;
     } else if (_emptyLocale is T) {
-      final Map<String, dynamic> map =
-          jsonDecode(reader.readString()) as Map<String, dynamic>;
+      final Map<String, dynamic> map = jsonDecode(reader.readString()) as Map<String, dynamic>;
       return Locale.fromSubtags(
         languageCode: map['languageCode']!.toString(),
         scriptCode: map['scriptCode']?.toString(),
@@ -122,17 +119,13 @@ class RxTypeAdapter<T> extends TypeAdapter<Rx<T>> {
   @override
   void write(BinaryWriter writer, Rx<T> obj) {
     if (obj.value is PropertyAccessorType) {
-      writer.writeInt(PropertyAccessorType.values
-          .indexOf(obj.value as PropertyAccessorType));
+      writer.writeInt(PropertyAccessorType.values.indexOf(obj.value as PropertyAccessorType));
     } else if (obj.value is PropertyNamingConventionsType) {
-      writer.writeInt(PropertyNamingConventionsType.values
-          .indexOf(obj.value as PropertyNamingConventionsType));
+      writer.writeInt(PropertyNamingConventionsType.values.indexOf(obj.value as PropertyNamingConventionsType));
     } else if (obj.value is PropertyNameSortingType) {
-      writer.writeInt(PropertyNameSortingType.values
-          .indexOf(obj.value as PropertyNameSortingType));
+      writer.writeInt(PropertyNameSortingType.values.indexOf(obj.value as PropertyNameSortingType));
     } else if (obj.value is EqualityMethodType) {
-      writer.writeInt(
-          EqualityMethodType.values.indexOf(obj.value as EqualityMethodType));
+      writer.writeInt(EqualityMethodType.values.indexOf(obj.value as EqualityMethodType));
     } else if (obj.value is Locale) {
       final Locale locale = obj.value as Locale;
       writer.writeString(jsonEncode(
