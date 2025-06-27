@@ -37,7 +37,7 @@ class ConfigSetting extends Setting<ConfigSetting> {
   @HiveField(7)
   Rx<PropertyNamingConventionsType> propertyNamingConventionsType = PropertyNamingConventionsType.camelCase.obs;
   @HiveField(8)
-  Rx<PropertyAccessorType> propertyAccessorType = PropertyAccessorType.final.obs;
+  Rx<PropertyAccessorType> propertyAccessorType = PropertyAccessorType.final_.obs;
   @HiveField(9)
   Rx<PropertyNameSortingType> propertyNameSortingType = PropertyNameSortingType.none.obs;
 
