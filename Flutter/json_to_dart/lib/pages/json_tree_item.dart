@@ -19,11 +19,7 @@ Widget _emptyWidget = Expanded(
 
 class JsonTreeItem extends StatefulWidget {
   const JsonTreeItem(this.object, this.property,
-      {Key? key,
-      this.isArray = false,
-      this.isObject = false,
-      this.depth = 0,
-      this.isArrayOject = false})
+      {Key? key, this.isArray = false, this.isObject = false, this.depth = 0, this.isArrayOject = false})
       : super(key: key);
   final FFDartObject object;
   final FFDartPropertyMixin property;
@@ -49,9 +45,8 @@ class _JsonTreeItemState extends State<JsonTreeItem> {
 
     final List<Widget> rowItems = <Widget>[];
 
-    final String key = widget.isArrayOject
-        ? DartType.Object.toString().replaceAll('DartType.', '')
-        : widget.property.key;
+    final String key =
+        widget.isArrayOject ? DartType.Object.toString().replaceAll('DartType.', '') : widget.property.key;
 
     rowItems.add(Expanded(
       flex: 3,
@@ -159,8 +154,7 @@ class _JsonTreeItemState extends State<JsonTreeItem> {
     }
 
     if (finalDepth > 0 && !widget.isArrayOject) {
-      rowItems.add(
-          Expanded(flex: 1, child: PropertyNameTextField(property: property)));
+      rowItems.add(Expanded(flex: 1, child: PropertyNameTextField(property: property)));
     } else {
       rowItems.add(_emptyWidget);
     }
@@ -176,8 +170,7 @@ class _JsonTreeItemState extends State<JsonTreeItem> {
                 ),
               ),
               child: Obx(() {
-                property.propertyAccessorType =
-                    ConfigSetting().propertyAccessorType.value;
+                property.propertyAccessorType = ConfigSetting().propertyAccessorType.value;
                 return PropertyAccessorTypeDropdownButton(property: property);
               }))
           : Container(
@@ -252,18 +245,24 @@ class ClassNameTextField extends StatelessWidget {
           );
         }),
         Expanded(
-          child: TextField(
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-            ),
-            controller: property.classNameTextEditingController,
-            onChanged: (String value) {
-              if (property.className != value) {
-                property.className = value;
-                property.checkError(property.className);
-              }
-            },
-          ),
+          child: Obx(() {
+            if (property.classNameTextEditingController.text != property.className) {
+              property.classNameTextEditingController.text = property.className;
+            }
+
+            return TextField(
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+              ),
+              controller: property.classNameTextEditingController,
+              onChanged: (String value) {
+                if (property.className != value) {
+                  property.className = value;
+                  property.checkError(property.className);
+                }
+              },
+            );
+          }),
         ),
       ],
     );
@@ -271,8 +270,7 @@ class ClassNameTextField extends StatelessWidget {
 }
 
 class PropertyNameTextField extends StatelessWidget {
-  const PropertyNameTextField({Key? key, required this.property})
-      : super(key: key);
+  const PropertyNameTextField({Key? key, required this.property}) : super(key: key);
   final FFDartPropertyMixin property;
   @override
   Widget build(BuildContext context) {
@@ -351,18 +349,12 @@ class PropertyAccessorTypeDropdownButton extends StatelessWidget {
           value: property.propertyAccessorType,
           items: PropertyAccessorType.values
               .where((PropertyAccessorType element) =>
-                  element == PropertyAccessorType.none ||
-                  element == PropertyAccessorType.final_)
-              .map<DropdownMenuItem<PropertyAccessorType>>(
-                  (PropertyAccessorType f) =>
-                      DropdownMenuItem<PropertyAccessorType>(
-                        value: f,
-                        child: Text(f
-                            .toString()
-                            .replaceAll('PropertyAccessorType.', '')
-                            .replaceAll('_', '')
-                            .toLowerCase()),
-                      ))
+                  element == PropertyAccessorType.none || element == PropertyAccessorType.final_)
+              .map<DropdownMenuItem<PropertyAccessorType>>((PropertyAccessorType f) =>
+                  DropdownMenuItem<PropertyAccessorType>(
+                    value: f,
+                    child: Text(f.toString().replaceAll('PropertyAccessorType.', '').replaceAll('_', '').toLowerCase()),
+                  ))
               .toList());
     });
   }
@@ -386,11 +378,10 @@ class DartTypeDropdownButton extends StatelessWidget {
         value: property.type == DartType.Null ? DartType.Object : property.type,
         items: DartType.values
             .where((DartType e) => e != DartType.Null)
-            .map<DropdownMenuItem<DartType>>(
-                (DartType f) => DropdownMenuItem<DartType>(
-                      value: f,
-                      child: Text(f.text),
-                    ))
+            .map<DropdownMenuItem<DartType>>((DartType f) => DropdownMenuItem<DartType>(
+                  value: f,
+                  child: Text(f.text),
+                ))
             .toList(),
       );
     });

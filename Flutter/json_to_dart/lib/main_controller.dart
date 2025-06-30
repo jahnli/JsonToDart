@@ -13,6 +13,7 @@ import 'package:json_to_dart/l10n/app_localizations.dart';
 import 'package:json_to_dart_library/json_to_dart_library.dart' hide StringE;
 
 import 'models/config.dart';
+import 'models/dart_object.dart';
 
 AppLocalizations get appLocalizations => AppLocalizations.of(Get.context!)!;
 
@@ -36,8 +37,7 @@ void showAlertDialog(String msg, [IconData data = Icons.warning]) {
 class MainController extends GetxController with JsonToDartControllerMixin {
   final TextEditingController _textEditingController = TextEditingController();
 
-  final TextEditingController fileHeaderHelpController = TextEditingController()
-    ..text = ConfigSetting().fileHeaderInfo;
+  final TextEditingController fileHeaderHelpController = TextEditingController()..text = ConfigSetting().fileHeaderInfo;
 
   DartObject? dartObject;
 
@@ -70,8 +70,7 @@ class MainController extends GetxController with JsonToDartControllerMixin {
       }
 
       final dynamic jsonData =
-          await compute<String, dynamic>(jsonDecode, inputText)
-              .onError((Object? error, StackTrace stackTrace) {
+          await compute<String, dynamic>(jsonDecode, inputText).onError((Object? error, StackTrace stackTrace) {
         handleError(error, stackTrace);
       });
 
@@ -88,15 +87,21 @@ class MainController extends GetxController with JsonToDartControllerMixin {
       }
 
       dartObject = extendedObject;
-      if (ConfigSetting().nullsafety.value &&
-          ConfigSetting().nullable.value &&
-          !ConfigSetting().smartNullable.value) {
+      if (ConfigSetting().nullsafety.value && ConfigSetting().nullable.value && !ConfigSetting().smartNullable.value) {
         updateNullable(true);
       }
 
+      // 应用层级命名结构
+      if (dartObject is FFDartObject) {
+        final FFDartObject rootObject = dartObject as FFDartObject;
+        // 处理所有子对象
+        rootObject.processChildObjects();
+        // 确保UI更新
+        update();
+      }
+
       final String? formatJsonString =
-          await compute<dynamic, String?>(formatJson, jsonData)
-              .onError((Object? error, StackTrace stackTrace) {
+          await compute<dynamic, String?>(formatJson, jsonData).onError((Object? error, StackTrace stackTrace) {
         handleError(error, stackTrace);
         return null;
       });
@@ -109,6 +114,9 @@ class MainController extends GetxController with JsonToDartControllerMixin {
       handleError(error, stackTrace);
     }
     SmartDialog.dismiss();
+
+    // 确保UI完全刷新
+    update();
   }
 
   @override
@@ -116,18 +124,15 @@ class MainController extends GetxController with JsonToDartControllerMixin {
     printedObjects.clear();
 
     if (dartObject != null) {
-      final DartObject? errorObject = allObjects.firstOrNullWhere(
-          (DartObject element) =>
-              element.hasClassError || element.hasPropertyError);
+      final DartObject? errorObject =
+          allObjects.firstOrNullWhere((DartObject element) => element.hasClassError || element.hasPropertyError);
       if (errorObject != null) {
-        showAlertDialog(errorObject.classError.join('\n') +
-            '\n' +
-            errorObject.propertyError.join('\n'));
+        showAlertDialog(errorObject.classError.join('\n') + '\n' + errorObject.propertyError.join('\n'));
         return null;
       }
 
-      final DartProperty? errorProperty = allProperties
-          .firstOrNullWhere((DartProperty element) => element.hasPropertyError);
+      final DartProperty? errorProperty =
+          allProperties.firstOrNullWhere((DartProperty element) => element.hasPropertyError);
 
       if (errorProperty != null) {
         showAlertDialog(errorProperty.propertyError.join('\n'));
@@ -148,14 +153,12 @@ class MainController extends GetxController with JsonToDartControllerMixin {
               if (end >= start) {
                 String format = info.substring(start, end - start).trim();
 
-                final String replaceString =
-                    info.substring(startIndex, end - startIndex + 1);
+                final String replaceString = info.substring(startIndex, end - startIndex + 1);
                 if (format == '') {
                   format = 'yyyy MM-dd';
                 }
 
-                info = info.replaceAll(
-                    replaceString, DateFormat(format).format(DateTime.now()));
+                info = info.replaceAll(replaceString, DateFormat(format).format(DateTime.now()));
               }
             }
           } catch (e) {
@@ -170,9 +173,8 @@ class MainController extends GetxController with JsonToDartControllerMixin {
         if (ConfigSetting().addMethod.value) {
           if (ConfigSetting().enableArrayProtection.value) {
             sb.writeLine('import \'dart:developer\';');
-            sb.writeLine(ConfigSetting().nullsafety.value
-                ? DartHelper.tryCatchMethodNullSafety
-                : DartHelper.tryCatchMethod);
+            sb.writeLine(
+                ConfigSetting().nullsafety.value ? DartHelper.tryCatchMethodNullSafety : DartHelper.tryCatchMethod);
           }
 
           sb.writeLine(ConfigSetting().enableDataProtection.value
